@@ -4,8 +4,8 @@ pipeline {
     environment {
         DOCKERHUB_USER    = 'tusharyadaav'
         BACKEND_IMAGE     = "${DOCKERHUB_USER}/crud-backend"
-        FRONTEND_IMAGE    = "${DOCKERHUB_USER}/crub-frontend"
-        EKS_CLUSTER       = 'your-cluster-name'
+        FRONTEND_IMAGE    = "${DOCKERHUB_USER}/crud-frontend"
+        EKS_CLUSTER       = 'demo-cluster'
         AWS_REGION        = 'us-east-1'
     }
 
