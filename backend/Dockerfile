@@ -1,4 +1,4 @@
-# ─── Stage 1: Build with Maven ────────────────────────────
+# ─── Stage 1: Build with Maven 
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
 # ✅ ENV must be AFTER FROM
