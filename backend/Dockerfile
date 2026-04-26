@@ -1,15 +1,22 @@
 # ─── Stage 1: Build with Maven ────────────────────────────
 FROM maven:3.9.6-eclipse-temurin-17 AS builder
 
+# ✅ ENV must be AFTER FROM
+ENV MAVEN_OPTS="-Xmx256m -Xms128m"
+
 WORKDIR /app
 
 # Cache dependencies first
 COPY pom.xml .
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline -B -q \
+    -Dmaven.artifact.threads=1
 
-# Copy source and build
+# Copy source code
 COPY src ./src
-RUN mvn clean package -DskipTests -B
+
+# ✅ Single build step (removed duplicate)
+RUN mvn clean package -DskipTests -B -q \
+    -Dmaven.artifact.threads=1
 
 # ─── Stage 2: Runtime image (slim) ────────────────────────
 FROM eclipse-temurin:17-jre-alpine
