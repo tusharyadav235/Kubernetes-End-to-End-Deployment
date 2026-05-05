@@ -5,7 +5,7 @@ pipeline {
         DOCKERHUB_USER    = 'tusharyadaav'
         BACKEND_IMAGE     = "${DOCKERHUB_USER}/crud-backend"
         FRONTEND_IMAGE    = "${DOCKERHUB_USER}/crud-frontend"
-        EKS_CLUSTER       = 'demo-cluster'
+        EKS_CLUSTER       = 'emptrack-cluster'
         AWS_REGION        = 'us-east-1'
     }
 
@@ -57,32 +57,36 @@ pipeline {
             }
         }
 
-        stage('Deploy to EKS') {
-            steps {
-                echo '🚀 Deploying to EKS...'
-                withCredentials([[
-                    $class: 'AmazonWebServicesCredentialsBinding',
-                    credentialsId: 'aws-creds'
-                ]]) {
-                    sh """
-                        aws eks update-kubeconfig \
-                          --region ${AWS_REGION} \
-                          --name ${EKS_CLUSTER}
+       stage('Deploy to EKS') {
+    steps {
+        echo '🚀 Deploying to EKS...'
 
-                        # Update image with build number for versioning
-                        kubectl set image deployment/backend \
-                          backend=${BACKEND_IMAGE}:${BUILD_NUMBER}
+        withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: 'aws-creds'
+        ]]) {
+            sh """
+                aws eks update-kubeconfig \
+                  --region ${AWS_REGION} \
+                  --name ${EKS_CLUSTER}
 
-                        kubectl set image deployment/frontend \
-                          frontend=${FRONTEND_IMAGE}:${BUILD_NUMBER}
+                # Update backend deployment
+                kubectl set image deployment/backend \
+                  backend=${BACKEND_IMAGE}:${BUILD_NUMBER} \
+                  -n emptrack
 
-                        # Wait for rollout
-                        kubectl rollout status deployment/backend
-                        kubectl rollout status deployment/frontend
-                    """
-                }
-            }
+                # Update frontend deployment
+                kubectl set image deployment/frontend \
+                  frontend=${FRONTEND_IMAGE}:${BUILD_NUMBER} \
+                  -n emptrack
+
+                # Wait for rollout completion
+                kubectl rollout status deployment/backend -n emptrack
+                kubectl rollout status deployment/frontend -n emptrack
+            """
         }
+    }
+}
 
     }
 
