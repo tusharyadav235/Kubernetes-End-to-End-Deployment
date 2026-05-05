@@ -5,7 +5,7 @@ pipeline {
         DOCKERHUB_USER    = 'tusharyadaav'
         BACKEND_IMAGE     = "${DOCKERHUB_USER}/crud-backend"
         FRONTEND_IMAGE    = "${DOCKERHUB_USER}/crud-frontend"
-        EKS_CLUSTER       = 'demo-cluster'
+        EKS_CLUSTER       = 'emptrack-cluster'
         AWS_REGION        = 'us-east-1'
     }
 
