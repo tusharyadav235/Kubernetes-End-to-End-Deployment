@@ -104,16 +104,27 @@ kubectl create secret generic mysql-secret -n emptrack \
   --from-literal=DB_NAME=employeedb1 \
   --from-literal=DB_USER=empuser \
   --from-literal=DB_PASSWORD=yourpassword
-
-# 4. Install ALB Controller
+# 4. Create serviceaccount
+eksctl create iamserviceaccount \
+  --cluster emptrack-cluster \
+  --namespace kube-system \
+  --name aws-load-balancer-controller \
+  --role-name AmazonEKSLoadBalancerControllerRole \
+  --attach-policy-arn arn:aws:iam::<Account id>:policy/AWSLoadBalancerControllerIAMPolicy \
+  --approve 
+# 5. Install ALB Controller
 helm repo add eks https://aws.github.io/eks-charts
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
-  -n kube-system --set clusterName=emptrack-cluster
+  -n kube-system \
+  --set clusterName=Learning-cluster \
+  --set serviceAccount.create=false \
+  --set serviceAccount.name=aws-load-balancer-controller \
+  --set region=us-east-1 \
 
-# 5. Deploy app
+# 6. Deploy app
 kubectl apply -f k8s/ -n emptrack
 
-# 6. Get ALB URL
+# 7. Get ALB URL
 kubectl get ingress -n emptrack
 ```
 
